@@ -47,8 +47,8 @@ async function search(query) {
     ];
 
     const browser = await puppeteer.launch({
-      userDataDir: './my/path',
       args: minimal_args,
+      executablePath: '/usr/bin/chromium'
     });
     const page = await browser.newPage();
     
