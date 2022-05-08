@@ -5,7 +5,7 @@ const writeData = data => {
   const { name, link } = data
 
   if (!fs.existsSync(dirPath)) {
-    fs.makeDir(dirPath);
+    fs.mkdirSync(dirPath);
   };
   
    fs.readFile(dirPath, 'utf-8', (err, data) => {
