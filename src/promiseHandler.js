@@ -67,6 +67,7 @@ const isMainPageUrl = url => {
 };
 
 const toWriteData = (name, link, isCreateData) => {
+  console.log(isCreateData)
   if (isCreateData) {
    return writeData({name, link})
   }
