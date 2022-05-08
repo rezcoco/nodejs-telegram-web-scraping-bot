@@ -8,7 +8,7 @@ const writeData = data => {
     fs.mkdirSync(dirPath);
     fs.writeFile(dirPath, '[]', err => {
       if (err) console.log(err)
-    }
+    })
   };
   
    fs.readFile(dirPath, 'utf-8', (err, data) => {
