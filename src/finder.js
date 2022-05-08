@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { isMainPageUrl } = require('./src/promiseHandler');
+const { isMainPageUrl } = require('./promiseHandler');
 
 async function search(query) {
   try {

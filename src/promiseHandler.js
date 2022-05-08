@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 const { getLink } = require('./src/api');
-const { writeData } = require('./src/createData');
+const { writeData } = require('./createData');
 
 const errorHandler = (bot, chatId, opts) => {
   return (err => {

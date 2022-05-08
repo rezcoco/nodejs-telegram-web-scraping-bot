@@ -1,5 +1,5 @@
 const fs = require('fs')
-const dirPath = './src/data.json'
+const dirPath = './data.json'
 
 const writeData = data => {
   const { name, link } = data
