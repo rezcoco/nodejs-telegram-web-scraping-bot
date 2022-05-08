@@ -24,7 +24,7 @@ const findPromiseHandler = (bot, chatId, opts) => {
 
 const scrapePromiseHandler = (bot, chatId, opts, url) => {
   const mainPageCheck = isMainPageUrl(url)
-  const isCreateData = process.env.CREATE_DATA
+  const isCreateData = process.env.CREATE_DATA || false
   let str
   if (mainPageCheck) {
     return (response => {
