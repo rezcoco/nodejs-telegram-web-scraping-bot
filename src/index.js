@@ -12,7 +12,7 @@ const { getLink } = require('./api');
 const bot = new TelegramBot(token, {polling: true});
 const opts = {
    reply_markup:{
-     inline_keyboard: [ [{ text: "Hello", data: "yes"}] ] // add keyboard response text
+     inline_keyboard: [ [{ text: "Hello", callback_data: "yes"}] ] // add keyboard response text
    },
   parse_mode: 'HTML'
 };
