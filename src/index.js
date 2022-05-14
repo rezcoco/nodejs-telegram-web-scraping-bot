@@ -11,9 +11,9 @@ const { getLink } = require('./api');
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 const opts = {
-  // reply_markup:{
-  //   keyboard: [ ['FAQ'], ['Buy'] ] // add keyboard response text
-  // },
+   reply_markup:{
+     inline_keyboard: [ [{ text: "Hello", data: "yes"}] ] // add keyboard response text
+   },
   parse_mode: 'HTML'
 };
 const app = express()
