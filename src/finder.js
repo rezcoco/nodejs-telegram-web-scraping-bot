@@ -6,8 +6,8 @@ async function search(query) {
   try {
     const url = 'https://mrcong.com/tim-kiem/'
     const browser = await puppeteer.launch({
-      args: minimal_args,
-      executablePath: '/usr/bin/chromium'
+      args: minimal_args
+      //executablePath: '/usr/bin/chromium'
     });
     const page = await browser.newPage();
  
