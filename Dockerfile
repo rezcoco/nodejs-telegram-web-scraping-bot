@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 RUN sudo apt-get install curl && \
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 RUN sudo apt install nodejs 
-COPY package*.json ./
+COPY package*.json .
 RUN npm install 
 COPY . .
 
