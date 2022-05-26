@@ -1,6 +1,6 @@
 name: Manually Deploy to Heroku
 
-on: worker-dispatch
+on: worker_dispatch
 
 jobs:
   deploy:
