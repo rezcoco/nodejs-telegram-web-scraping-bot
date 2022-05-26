@@ -1,13 +1,14 @@
 FROM ubuntu:latest
 
 WORKDIR /usr/src/app
-RUN sudo apt-get update
-RUN sudo apt-get install curl
+RUN chmod 777 /usr/src/app
+
+RUN apt-get update
+RUN apt-get install curl
 RUN curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-RUN sudo apt-get install nodejs 
+RUN apt-get install nodejs 
 COPY package*.json .
 RUN npm install 
 COPY . .
 
-EXPOSE 8080
 CMD [ "npm", "start" ]
