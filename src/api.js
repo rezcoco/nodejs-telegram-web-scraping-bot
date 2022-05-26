@@ -5,8 +5,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 const getLink = async url => {
-  const promise = await axios.get(url, {httpsAgent: agent})
-  return promise
+  return axios.get(url, {httpsAgent: agent})
 }
 
 module.exports.getLink = getLink

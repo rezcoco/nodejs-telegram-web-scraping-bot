@@ -1,47 +1,10 @@
 const puppeteer = require('puppeteer');
-const { isMainPageUrl } = require('./promiseHandler');
+const { dataUrl, isMainPageUrl } = require('./handler');
+const { minimal_args } = require('./utilities');
 
 async function search(query) {
   try {
     const url = 'https://mrcong.com/tim-kiem/'
-    const minimal_args = [
-      '--autoplay-policy=user-gesture-required',
-      '--disable-background-networking',
-      '--disable-background-timer-throttling',
-      '--disable-backgrounding-occluded-windows',
-      '--disable-breakpad',
-      '--disable-client-side-phishing-detection',
-      '--disable-component-update',
-      '--disable-default-apps',
-      '--disable-dev-shm-usage',
-      '--disable-domain-reliability',
-      '--disable-extensions',
-      '--disable-features=AudioServiceOutOfProcess',
-      '--disable-hang-monitor',
-      '--disable-ipc-flooding-protection',
-      '--disable-notifications',
-      '--disable-offer-store-unmasked-wallet-cards',
-      '--disable-popup-blocking',
-      '--disable-print-preview',
-      '--disable-prompt-on-repost',
-      '--disable-renderer-backgrounding',
-      '--disable-setuid-sandbox',
-      '--disable-speech-api',
-      '--disable-sync',
-      '--hide-scrollbars',
-      '--ignore-gpu-blacklist',
-      '--metrics-recording-only',
-      '--mute-audio',
-      '--no-default-browser-check',
-      '--no-first-run',
-      '--no-pings',
-      '--no-sandbox',
-      '--no-zygote',
-      '--password-store=basic',
-      '--use-gl=swiftshader',
-      '--use-mock-keychain',
-    ];
-
     const browser = await puppeteer.launch({
       args: minimal_args,
       executablePath: '/usr/bin/chromium'
@@ -62,12 +25,14 @@ async function search(query) {
       try {
         const links = document.querySelectorAll('div.gs-title a.gs-title')
         let arr = []
-        for (let i = 0; i < 5; i++) {
-          arr.push({
-            name: links[i].innerText,
-            link: links[i].href
-           })
-         }
+        for (let i = 0; i < links.length; i++) {
+          if (links[i].innerText && links[i].href) {
+            arr.push({
+              name: links[i].innerText,
+              link: links[i].href
+             })
+           }
+        }
         return arr
       } catch (e) {
         return undefined
@@ -84,36 +49,8 @@ async function search(query) {
 
     // find best result
     if (linksArr) {
-      const args = query.split(' ')
-      let linkResult
-      for (let i = 0; i < linksArr.length; i++) {
-    
-        const linkText = linksArr[i].name
-        const pageUrl = linksArr[i].link
-        const isTrue = []
-    
-        for (let j = 0; j < args.length; j++) {
-          const strRegEx = `${args[j]}`
-          const newRegEx = new RegExp(strRegEx, "i")
-          
-          const isFound = linkText.search(newRegEx)
-          if (isFound !== -1) {
-            isTrue.push(pageUrl)  
-          } else {
-            isTrue.push(undefined)
-          }
-        }
-        if (isTrue.every(Boolean)) {
-          linkResult = isTrue[i]
-
-          if (isMainPageUrl(linkResult)) {
-            return found(linkResult, "Success")
-          } else {
-            return found(undefined, "<b>Failed to get main page url</b>")
-          }
-        }
-      }
-      return found(undefined, `<i>${query}</i> is <b>Not Found</b>`)
+      dataUrl.data = linksArr
+      return found(linksArr, 'Success')
     }
     return found(undefined, `Your search <i>${query}</i> did not match any results`)
   } catch (error) {
