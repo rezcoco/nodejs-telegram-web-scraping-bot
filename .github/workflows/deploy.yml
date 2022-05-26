@@ -1,9 +1,6 @@
 name: Manually Deploy to Heroku
 
-on:
-  push:
-    branches:
-      - master
+on: worker-dispatch
 
 jobs:
   deploy:
