@@ -79,20 +79,22 @@ const scrapeHandler = async (msg, match) => {
   }
 }
 
-const grabberHandler = async (msg, match) => {
+const grabHandler = async (msg, match) => {
   try {
     const chatId = msg.chat.id;
     const resp = match[1];
-    const args = resp.split(' page ')
-    const query = args[0]
-    const page = !args[1] ? 'end' : Number(args[1])
+    const regExp = resp.match(/start\s\d+/)
+    const start = regExp ? Number(regExp[0].split(' ')[1]) : null
+    const page = Number(resp.split(' page ')[1])
+    const query = resp.split(' ')[0]
     
-   const botMsg = bot.sendMessage(chatId, `<b>Grabbing:</b> ${query}`, htmlParse)
+    const botMsg = bot.sendMessage(chatId, `<b>Grabbing:</b> ${query}`, htmlParse)
+
     const isFound = []
     for (const element of tag) {
       if (element.name.toLowerCase() == query.toLowerCase()) {
         isFound.push(true)
-        const { totalGrabbed, msg: grbMsg } = await grabber(bot, chatId, botMsg, element.link, page)
+        const { totalGrabbed, msg: grbMsg } = await grabber(bot, chatId, botMsg, element.link, start, page)
         const { message_id } = await grbMsg
         if (totalGrabbed == 0) return bot.editMessageText(`Done, <i>${totalGrabbed}</i> Data grabbed. All data already inserted`, { chat_id: chatId, message_id, parse_mode: 'HTML' })
         bot.editMessageText(`Done, <i>${totalGrabbed}</i> Data grabbed`, { chat_id: chatId, message_id, parse_mode: 'HTML' })
