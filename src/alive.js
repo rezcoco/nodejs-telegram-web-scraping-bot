@@ -7,14 +7,15 @@ const agent = new https.Agent({
 });
 
 if (BASE_URL) {
-  while (true) {
-    try {
-      const alive = () => {
-        axios.get(BASE_URL, {httpsAgent: agent})
-      }
-      setInterval(alive, 600000)
-    } catch (err) {
-      console.log(err)
+  try {
+    const alive = () => {
+      const time = new Date()
+      const hours = time.getHours(), minutes = time.getMinutes()
+      axios.get(BASE_URL, {httpsAgent: agent})
+      console.log(`Waked up at: ${hours}:${minutes}`)
     }
+    setInterval(alive, 600000)
+  } catch (err) {
+    console.log(err)
   }
 }
