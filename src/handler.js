@@ -15,11 +15,11 @@ const deleteMessageHandler = async (bot, botMsg) => {
   }
 }
 
-const grabber = async (bot, chatId, botMsg, baseUrl, page) => {
+const grabber = async (bot, chatId, botMsg, baseUrl, start, page) => {
   let totalGrabbed = 0
-  let pageNum = 1
+  let pageNum = start ? start : 1
   let msg
-  let toEnd = page == 'end' ? true : false
+  let toEnd = Number.isNaN(page) ? true : false
  
   if (!IS_DB) return { totalGrabbed, msg: botMsg }
 
