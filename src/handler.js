@@ -31,7 +31,7 @@ const grabber = async (bot, chatId, botMsg, baseUrl, page) => {
       if (!data) break
       const res = await scrape(data)
       for (const link of res) {
-        insertToDb(link, totalGrabbed)
+        totalGrabbed += await insertToDb(link)
       }
       if (!msg) {
         msg = bot.editMessageText(`<i>${totalGrabbed}</i> Data grabbed from page <i>1</i> to <i>${pageNum}</i>`, { chat_id: chatId, message_id, parse_mode: 'HTML' })
@@ -202,16 +202,17 @@ const opts = (isKeyboard=false, query=null) => {
   return { "parse_mode": "HTML"}
 }
 
-const insertToDb = async (obj, totalGrabbed) => {
+const insertToDb = async (obj) => {
   try {
     const check = await Link.isDuplicate(obj.name)
     if (!check) {
       const db = new Link(obj)
       const save = await db.save()
-      totalGrabbed += 1
       console.log(save.name)
+      return 1
     } else {
       console.log(`${obj.name} already inserted`)
+      return 0
     }
   } catch (err) {
     console.log(err)
