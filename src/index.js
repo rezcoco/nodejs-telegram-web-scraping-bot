@@ -94,6 +94,7 @@ const grabberHandler = async (msg, match) => {
         isFound.push(true)
         const { totalGrabbed, msg: grbMsg } = await grabber(bot, chatId, botMsg, element.link, page)
         const { message_id } = await grbMsg
+        if (totalGrabbed == 0) return bot.editMessageText(`Done, <i>${totalGrabbed}</i> Data grabbed. All data already inserted`, { chat_id: chatId, message_id, parse_mode: 'HTML' })
         bot.editMessageText(`Done, <i>${totalGrabbed}</i> Data grabbed`, { chat_id: chatId, message_id, parse_mode: 'HTML' })
       } else isFound.push(undefined)
     }
