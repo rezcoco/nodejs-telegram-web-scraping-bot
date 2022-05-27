@@ -182,7 +182,7 @@ app.listen(PORT, () => {
 })
 
 bot.onText(/\/find (.+)/, findHandler)
-bot.onText(/\/grab (.+)/, grabberHandler)
+bot.onText(/\/grab (.+)/, grabHandler)
 bot.onText(/\/tag (.+)/, tagHandler)
 bot.onText(/\/scrape (.+)/, scrapeHandler)
 bot.on('callback_query', callbackQueryHandler)
