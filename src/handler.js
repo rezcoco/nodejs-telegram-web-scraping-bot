@@ -130,6 +130,7 @@ const messageBuilder = async (bot, botMsg, context) => {
 const tagSearch = async url => {
   try {
     const { data } = await getLink(url)
+    console.log(data)
     dataUrl.page = getPageNumber(url)
     const $ = cheerio.load(data)
     const element = $('h2.post-box-title > a')
