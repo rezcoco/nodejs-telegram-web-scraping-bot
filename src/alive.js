@@ -6,7 +6,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
-if (BASE_URL) {
+const keepAlive = () => {
   try {
     const alive = () => {
       const time = new Date()
@@ -14,8 +14,10 @@ if (BASE_URL) {
       axios.get(BASE_URL, {httpsAgent: agent})
       console.log(`Waked up at: ${hours}:${minutes}`)
     }
-    setInterval(alive, 5000)
+    setInterval(alive, 1 * 60 * 1000)
   } catch (err) {
     console.log(err)
   }
 }
+
+if (BASE_URL) keepAlive()
