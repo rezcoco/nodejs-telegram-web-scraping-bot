@@ -6,6 +6,8 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
+console.log(BASE_URL)
+
 const keepAlive = () => {
   try {
     const alive = () => {
