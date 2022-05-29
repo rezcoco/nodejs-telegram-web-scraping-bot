@@ -11,4 +11,4 @@ if (BASE_URL) {
     console.log(`Waked up at: ${hours}:${minutes}`)
   }
   setInterval(alive, 1 * 60 * 1000)
-}
+} 
