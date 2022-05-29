@@ -5,9 +5,11 @@ const express = require('express');
 const token = process.env.TOKEN
 const PORT = process.env.PORT || 8000
 const IS_DB = process.env.IS_DB || false
+const BASE_URL = process.env.BASE_URL || false
 const { isTagUrl, isMainPageUrl, getPageNumber, inlineKeyboardBuilder, opts, messageBuilder, deleteMessageHandler, tagSearch, tagSearchHelper, scrape, dataUrl, grabber } = require('./handler');
 const { tag } = require('./utilities')
 const { search } = require('./finder');
+const { keepAlive } = require('./alive')
 const { getLink } = require('./api');
 const { main } = require('./db')
 
@@ -17,6 +19,7 @@ const htmlParse = { parse_mode: 'HTML' }
 
 const app = express()
 if (IS_DB) main()
+if (BASE_URL) keepAlive()
 
 // Matches "/find [whatever]"
 const findHandler = async (msg, match) => {
