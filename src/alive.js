@@ -1,6 +1,6 @@
 const { getLink: ping } = require('./api')
 
-const keepAlive = () => {
+const keepAlive = (BASE_URL) => {
   const alive = () => {
     const time = new Date()
     const hours = time.getHours(), minutes = time.getMinutes()
