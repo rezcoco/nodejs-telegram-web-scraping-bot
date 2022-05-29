@@ -1,21 +1,26 @@
-const https = require('node:https');
-const axios = require('axios');
+const http = require('http');
 const BASE_URL = process.env.BASE_URL || false
 
-const agent = new https.Agent({  
-  rejectUnauthorized: false
-});
-
-if (BASE_URL) {
-  try {
-    const alive = () => {
-      const time = new Date()
-      const hours = time.getHours(), minutes = time.getMinutes()
-      axios.get(BASE_URL, {httpsAgent: agent})
-      console.log(`Waked up at: ${hours}:${minutes}`)
-    }
-    setInterval(alive, 600000)
-  } catch (err) {
-    console.log(err)
-  }
+function startKeepAlive() {
+    setInterval(function() {
+        var options = {
+            host: BASE_URL,
+            port: 80,
+            path: '/'
+        };
+        http.get(options, function(res) {
+            res.on('data', function(chunk) {
+                try {
+                    // optional logging... disable after it's working
+                    console.log("HEROKU RESPONSE: " + chunk);
+                } catch (err) {
+                    console.log(err.message);
+                }
+            });
+        }).on('error', function(err) {
+            console.log("Error: " + err.message);
+        });
+    }, 10 * 60 * 1000); // load every 10 minutes
 }
+
+if (BASE_URL) startKeepAlive();
