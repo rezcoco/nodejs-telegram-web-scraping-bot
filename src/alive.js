@@ -1,9 +1,5 @@
 const BASE_URL = process.env.BASE_URL || false
-const { getLink: ping } = require(./api)
-
-const agent = new https.Agent({  
-  rejectUnauthorized: false
-});
+const { getLink: ping } = require('./api')
 
 console.log(BASE_URL)
 
