@@ -19,7 +19,7 @@ const htmlParse = { parse_mode: 'HTML' }
 
 const app = express()
 if (IS_DB) main()
-if (BASE_URL) keepAlive()
+if (BASE_URL) keepAlive(BASE_URL)
 
 // Matches "/find [whatever]"
 const findHandler = async (msg, match) => {
