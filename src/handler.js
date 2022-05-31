@@ -213,6 +213,7 @@ const insertToDb = async ({ name, link }) => {
         return 1
       } else {
         console.log(`${link} is not MediaFire`)
+        return 0
       }
     } else {
       console.log(`${name} already inserted`)
