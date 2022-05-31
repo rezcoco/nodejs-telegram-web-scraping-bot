@@ -202,7 +202,7 @@ const opts = (isKeyboard=false, query=null) => {
   return { "parse_mode": "HTML"}
 }
 
-const insertToDb = async ({ name, link}) => {
+const insertToDb = async ({ name, link }) => {
   try {
     const check = await Link.isDuplicate(name)
     if (!check && isMediafire(link)) {
