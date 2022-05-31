@@ -202,10 +202,10 @@ const opts = (isKeyboard=false, query=null) => {
   return { "parse_mode": "HTML"}
 }
 
-const insertToDb = async (obj) => {
+const insertToDb = async ({ name, link}) => {
   try {
-    const check = await Link.isDuplicate(obj.name)
-    if (!check) {
+    const check = await Link.isDuplicate(name)
+    if (!check && isMediafire(link)) {
       const db = new Link(obj)
       const save = await db.save()
       console.log(save.name)
@@ -222,6 +222,10 @@ const insertToDb = async (obj) => {
 const isMainPageUrl = url => {
   return url.match(/.+(anh\/|videos\/|video\/)$/)
 };
+
+const isMediafire = url => {
+ return url.match(/^(https:\/\/www.mediafire.com\/file\/).+/)
+}
 
 const isTagUrl = url => {
   return url.match(/.+(\/tag\/).+/)
