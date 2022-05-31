@@ -229,7 +229,11 @@ const isMainPageUrl = url => {
 };
 
 const isMediafire = url => {
- return url.match(/^(https:\/\/www.mediafire.com\/file\/).+/)
+  if (Array.isArray(url)) {
+    const result = url.map((link) => link.match(/^(https:\/\/www.mediafire.com\/file\/).+/))
+    return result.every(Boolean)
+  }
+  return url.match(/^(https:\/\/www.mediafire.com\/file\/).+/)
 }
 
 const isTagUrl = url => {
