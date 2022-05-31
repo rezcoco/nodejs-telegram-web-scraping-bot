@@ -205,11 +205,15 @@ const opts = (isKeyboard=false, query=null) => {
 const insertToDb = async ({ name, link }) => {
   try {
     const check = await Link.isDuplicate(name)
-    if (!check && isMediafire(link)) {
-      const db = new Link({ name, link })
-      const save = await db.save()
-      console.log(save.name)
-      return 1
+    if (!check) {
+      if (isMediafire(link)) {
+        const db = new Link({ name, link })
+        const save = await db.save()
+        console.log(save.name)
+        return 1
+      } else {
+        console.log(`${link} is not MediaFire`)
+      }
     } else {
       console.log(`${name} already inserted`)
       return 0
