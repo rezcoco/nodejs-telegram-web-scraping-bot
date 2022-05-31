@@ -206,12 +206,12 @@ const insertToDb = async ({ name, link }) => {
   try {
     const check = await Link.isDuplicate(name)
     if (!check && isMediafire(link)) {
-      const db = new Link(obj)
+      const db = new Link({ name, link })
       const save = await db.save()
       console.log(save.name)
       return 1
     } else {
-      console.log(`${obj.name} already inserted`)
+      console.log(`${name} already inserted`)
       return 0
     }
   } catch (err) {
