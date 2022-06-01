@@ -48,8 +48,14 @@ const grabber = async (bot, chatId, botMsg, baseUrl, start, page) => {
 }
 
 const scrape = async (mainPageUrl) => {
-  const btnSelector = 'a.shortc-button.medium.green'
+  const terabox = 'a.shortc-button.medium.blue'
+  const anonfiles = 'a.shortc-button.medium.black'
+  const meganz = 'a.shortc-button.medium.red'
+  const mediafire = 'a.shortc-button.medium.green'
+
+  const btnSelector = mediafire || anonfiles || terabox || meganz
   const titleSelector = 'h1.name.post-title.entry-title'
+
   try {
     if (Array.isArray(mainPageUrl)) {
       const arr = []
@@ -61,7 +67,8 @@ const scrape = async (mainPageUrl) => {
         const name = $(titleSelector).text()
         const link = $(btnSelector).attr('href')
         
-        if (isParts > 1) {
+        if ($(btnSelector)) {
+          if (isParts > 1) {
           const linkNodeList = $(btnSelector)
           const links = []
       
@@ -70,8 +77,11 @@ const scrape = async (mainPageUrl) => {
             links.push(pageUrl)
           }
           arr.push({ name, link: links })
+          } else {
+            arr.push({ name, link })
+          }
         } else {
-          arr.push({ name, link })
+          arr.push({ name, link: 'Not Found' })
         }
       }
       return arr
@@ -83,7 +93,8 @@ const scrape = async (mainPageUrl) => {
       const name = $(titleSelector).text()
       const link = $(btnSelector).attr('href')
       
-      if (isParts > 1) {
+      if ($(btnSelector)) {
+        if (isParts > 1) {
         const linkNodeList = $(btnSelector)
         const links = []
     
@@ -92,8 +103,11 @@ const scrape = async (mainPageUrl) => {
           links.push(pageUrl)
         }
         return { name, link: links }
+        } else {
+          return { name, link }
+        }
       } else {
-        return { name, link }
+         arr.push({ name, link: 'Not Found' })
       }
     }
   } catch (err) {
@@ -206,13 +220,13 @@ const insertToDb = async ({ name, link }) => {
   try {
     const check = await Link.isDuplicate(name)
     if (!check) {
-      if (isMediafire(link)) {
+      if (isDownloadLink(link)) {
         const db = new Link({ name, link })
         const save = await db.save()
         console.log(save.name)
         return 1
       } else {
-        console.log(`${link} is not MediaFire`)
+        console.log(`${link} is not Downloadable`)
         return 0
       }
     } else {
@@ -228,12 +242,12 @@ const isMainPageUrl = url => {
   return url.match(/.+(anh\/|videos\/|video\/)$/)
 };
 
-const isMediafire = url => {
+const isDownloadLink = url => {
   if (Array.isArray(url)) {
-    const result = url.map((link) => link.match(/^(https:\/\/www.mediafire.com\/file\/).+/))
+    const result = url.map((link) => link.match(/.+(mediafire|anonfiles|terabox|mega).+/))
     return result.every(Boolean)
   }
-  return url.match(/^(https:\/\/www.mediafire.com\/file\/).+/)
+  return url.match(/.+(mediafire|anonfiles|terabox|mega).+/)
 }
 
 const isTagUrl = url => {
