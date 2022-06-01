@@ -53,8 +53,18 @@ const scrape = async (mainPageUrl) => {
   const meganz = 'a.shortc-button.medium.red'
   const mediafire = 'a.shortc-button.medium.green'
 
-  const btnSelector = mediafire || anonfiles || terabox || meganz
+  let btnSelector = mediafire
   const titleSelector = 'h1.name.post-title.entry-title'
+  const downloadSelector = ($) => {
+    const selector = [mediafire, anonfiles, terabox, meganz]
+    for (let i = 0; i < selector.length; i++) {
+      const check = $(selector[i]).attr('href')
+      if (check) {
+        btnSelector = selector[i]
+        break
+      }
+    }
+  }
 
   try {
     if (Array.isArray(mainPageUrl)) {
@@ -62,12 +72,13 @@ const scrape = async (mainPageUrl) => {
       for (const element of mainPageUrl) {
         const { data } = await getLink(element.link)
         const $ = cheerio.load(data)
+        downloadSelector($)
       
         const isParts = $(btnSelector).length
         const name = $(titleSelector).text()
         const link = $(btnSelector).attr('href')
         
-        if ($(btnSelector)) {
+        if (link) {
           if (isParts > 1) {
           const linkNodeList = $(btnSelector)
           const links = []
@@ -88,12 +99,13 @@ const scrape = async (mainPageUrl) => {
     } else {
       const { data } = await getLink(mainPageUrl)
       const $ = cheerio.load(data)
-    
+      downloadSelector($)
+      
       const isParts = $(btnSelector).length
       const name = $(titleSelector).text()
       const link = $(btnSelector).attr('href')
       
-      if ($(btnSelector)) {
+      if (link) {
         if (isParts > 1) {
         const linkNodeList = $(btnSelector)
         const links = []
