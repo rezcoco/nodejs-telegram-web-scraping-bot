@@ -1,6 +1,8 @@
 const cheerio = require('cheerio');
+const urlParse = require('url');
 const { getLink } = require('./api');
 const { Link } = require('./db')
+const { ouo } = require('./ouo')
 const IS_DB = process.env.IS_DB || false
 const dataUrl = {}
 
@@ -85,14 +87,24 @@ const scrape = async (mainPageUrl) => {
       
           for (let i = 0; i < isParts; i++) {
             const pageUrl = linkNodeList[i].attribs.href
-            links.push(pageUrl)
+            if (isShortlink(pageUrl)) {
+              const l = await ouo(pageUrl)
+              links.push(l)
+            } else {
+              links.push(pageUrl)
+            }
           }
           arr.push({ name, link: links })
           } else {
-            arr.push({ name, link })
+              if (isShortlink(link)) {
+                const l = await ouo(link)
+                arr.push({ name, link: l })
+              } else {
+                arr.push({ name, link })
+              }
           }
         } else {
-          arr.push({ name, link: 'Not Found' })
+          arr.push({ name, link: null })
         }
       }
       return arr
@@ -107,19 +119,29 @@ const scrape = async (mainPageUrl) => {
       
       if (link) {
         if (isParts > 1) {
-        const linkNodeList = $(btnSelector)
-        const links = []
-    
-        for (let i = 0; i < isParts; i++) {
-          const pageUrl = linkNodeList[i].attribs.href
-          links.push(pageUrl)
-        }
-        return { name, link: links }
+          const linkNodeList = $(btnSelector)
+          const links = []
+      
+          for (let i = 0; i < isParts; i++) {
+            const pageUrl = linkNodeList[i].attribs.href
+            if (isShortlink(pageUrl)) {
+              const l = await ouo(pageUrl)
+              links.push(l)
+            } else {
+              links.push(pageUrl)
+            }
+          }
+          return { name, link: links }
         } else {
-          return { name, link }
+            if (isShortlink(link)) {
+              const l = await ouo(link)
+              return { name, link: l }
+            } else {
+              return { name, link }
+            }
         }
       } else {
-         arr.push({ name, link: 'Not Found' })
+         arr.push({ name, link: null })
       }
     }
   } catch (err) {
@@ -254,6 +276,20 @@ const isMainPageUrl = url => {
   return url.match(/.+(anh\/|videos\/|video\/)$/)
 };
 
+const isShortlink = (url) => {
+  const { hostname } = urlParse.parse(url)
+  let result
+  switch (hostname) {
+    case 'ouo.press':
+    case 'ouo.io' :
+      result = true
+      break
+    default:
+      result = false
+  }
+  return result
+}
+
 const isDownloadLink = url => {
   if (Array.isArray(url)) {
     const result = url.map((link) => link.match(/.+(mediafire|anonfiles|terabox|mega).+/))
@@ -274,4 +310,8 @@ const getPageNumber = url => {
   return regExp
 }
 
-module.exports = { grabber, scrape, dataUrl, isMainPageUrl, isTagUrl, tagSearch, tagSearchHelper, getPageNumber, inlineKeyboardBuilder, opts ,deleteMessageHandler, messageBuilder };
+const getTagUrl = (url) => {
+  return url.match(/.+(?=page\/\d\/)/)
+}
+
+module.exports = { grabber, scrape, dataUrl, isMainPageUrl, isTagUrl, getTagUrl, tagSearch, tagSearchHelper, getPageNumber, inlineKeyboardBuilder, opts ,deleteMessageHandler, messageBuilder };

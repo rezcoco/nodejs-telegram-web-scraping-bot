@@ -1,6 +1,8 @@
 const cheerio = require('cheerio');
+const urlParse = require('url');
 const { getLink } = require('./api');
 const { Link } = require('./db')
+const { ouo } = require('./ouo')
 const IS_DB = process.env.IS_DB || false
 const dataUrl = {}
 
@@ -107,16 +109,26 @@ const scrape = async (mainPageUrl) => {
       
       if (link) {
         if (isParts > 1) {
-        const linkNodeList = $(btnSelector)
-        const links = []
-    
-        for (let i = 0; i < isParts; i++) {
-          const pageUrl = linkNodeList[i].attribs.href
-          links.push(pageUrl)
-        }
-        return { name, link: links }
+          const linkNodeList = $(btnSelector)
+          const links = []
+      
+          for (let i = 0; i < isParts; i++) {
+            const pageUrl = linkNodeList[i].attribs.href
+            if (isShortlink(pageUrl)) {
+              const l = await ouo(pageUrl)
+              links.push(l)
+            } else {
+              links.push(pageUrl)
+            }
+          }
+          return { name, link: links }
         } else {
-          return { name, link }
+          if (isShortlink(link)) {
+            const l = await ouo(link)
+            return { name, link: l }
+          } else {
+            return { name, link }
+          }
         }
       } else {
          arr.push({ name, link: 'Not Found' })
@@ -253,6 +265,21 @@ const insertToDb = async ({ name, link }) => {
 const isMainPageUrl = url => {
   return url.match(/.+(anh\/|videos\/|video\/)$/)
 };
+
+const isShortlink = (url) => {
+  const { hostname } = urlParse.parse(url)
+  let result
+  console.log(hostname)
+  switch (hostname) {
+    case 'ouo.press':
+    case 'ouo.io' :
+      result = true
+      break
+    default:
+      result = false
+  }
+  return result
+}
 
 const isDownloadLink = url => {
   if (Array.isArray(url)) {

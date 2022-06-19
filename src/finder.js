@@ -1,25 +1,23 @@
 const puppeteer = require('puppeteer');
 const { dataUrl, isMainPageUrl } = require('./handler');
 const { minimal_args } = require('./utilities');
+const b = require('./index');
 
 async function search(query) {
   try {
+    const browser = await b.b
     const url = 'https://mrcong.com/tim-kiem/'
-    const browser = await puppeteer.launch({
-      args: minimal_args
-      //executablePath: '/usr/bin/chromium'
-    });
     const page = await browser.newPage();
  
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')
     await page.setDefaultNavigationTimeout(0);
 
     await page.goto(url);
+    await page.waitForSelector('.gsc-input')
 
     await page.type('#gsc-i-id1', query);
     await page.click('#___gcse_0 > div > div > form > table > tbody > tr > td.gsc-search-button > button');
- 
-    await page.waitForTimeout(1000)
+    await page.waitForSelector('.gsc-orderby')
 
     const linksArr = await page.evaluate( () => {
       try {
@@ -41,7 +39,7 @@ async function search(query) {
     });
 
     // await page.screenshot({path: 'test.png', fullPage: true})
-    await browser.close();
+    await page.close();
 
     const found = (result, reason) => {
       return { result, reason }

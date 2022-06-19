@@ -1,13 +1,14 @@
 require('dotenv').config()
 
 const TelegramBot = require('node-telegram-bot-api');
-const express = require('express');
+const app = require('express')();
+const puppeteer = require('puppeteer');
 const token = process.env.TOKEN
 const PORT = process.env.PORT || 8000
 const IS_DB = process.env.IS_DB || false
 const BASE_URL = process.env.BASE_URL || false
-const { isTagUrl, isMainPageUrl, getPageNumber, inlineKeyboardBuilder, opts, messageBuilder, deleteMessageHandler, tagSearch, tagSearchHelper, scrape, dataUrl, grabber } = require('./handler');
-const { tag } = require('./utilities')
+const { isTagUrl, getTagUrl, isMainPageUrl, getPageNumber, inlineKeyboardBuilder, opts, messageBuilder, deleteMessageHandler, tagSearch, tagSearchHelper, scrape, dataUrl, grabber } = require('./handler');
+const { tag, minimal_args } = require('./utilities')
 const { search } = require('./finder');
 const { keepAlive } = require('./alive')
 const { getLink } = require('./api');
@@ -16,8 +17,10 @@ const { main } = require('./db')
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 const htmlParse = { parse_mode: 'HTML' }
-
-const app = express()
+// puppeteer
+const b = puppeteer.launch({ headless: false, args: minimal_args, executablePath: '/usr/bin/chromium' })
+b.then(() => console.log('Puppeteer launched')).catch(e => console.log(e))
+  
 if (IS_DB) main()
 if (BASE_URL) keepAlive(BASE_URL)
 
@@ -54,7 +57,7 @@ const tagHandler = async (msg, match) => {
       if (element.name.toLowerCase() == resp.toLowerCase()) {
         isFound.push(true)
         dataUrl.url = element.link
-        const addPage = `${element.link}page/1/`
+        const addPage = getPageNumber(element.link) ? element.link : `${element.link}page/1/`
         const response = tagSearch(addPage)
         tagSearchHelper(bot, botMsg, response)
       } else {
@@ -129,7 +132,8 @@ const callbackQueryHandler = async callbackQuery => {
   
     } else if (query == 'nextPage') {
       const { url, page } = dataUrl
-      const link = `${url}page/${page+1}/`
+      const notPage = getTagUrl(url)[0]
+      const link = `${notPage}page/${page+1}/`
       
       bot.deleteMessage(chatId, message_id)
       const botMsg = bot.sendMessage(chatId, '<i>Getting next page...</i>', htmlParse)
@@ -138,7 +142,8 @@ const callbackQueryHandler = async callbackQuery => {
       
     } else if (query == 'prevPage') {
       const { url, page } = dataUrl
-      const link = `${url}page/${page-1}/`
+      const notPage = getTagUrl(url)[0]
+      const link = `${notPage}page/${page-1}/`
       
       bot.deleteMessage(chatId, message_id)
       const botMsg = bot.sendMessage(chatId, '<i>Getting previous page...</i>', htmlParse)
@@ -154,8 +159,8 @@ const callbackQueryHandler = async callbackQuery => {
         messageBuilder(bot, botMsg, response )
         
       } else if (isTagUrl(data[query].link)) {
-        dataUrl.url = data[query].link
         const addPage = getPageNumber(data[query].link) ? data[query].link : `${data[query].link}page/1/`
+        dataUrl.url = addPage
         const response = tagSearch(addPage)
         tagSearchHelper(bot, botMsg, response)
         
@@ -181,7 +186,7 @@ app.get('/', (req, res) => {
   res.send("It's Running")
 })
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
+  console.log(`Server listening to port: ${PORT}`)
 })
 
 bot.onText(/\/find (.+)/, findHandler)
@@ -189,3 +194,5 @@ bot.onText(/\/grab (.+)/, grabHandler)
 bot.onText(/\/tag (.+)/, tagHandler)
 bot.onText(/\/scrape (.+)/, scrapeHandler)
 bot.on('callback_query', callbackQueryHandler)
+
+module.exports.b = b
