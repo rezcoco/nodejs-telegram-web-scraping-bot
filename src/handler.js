@@ -1,8 +1,8 @@
 const cheerio = require('cheerio');
 const urlParse = require('url');
+const { exec } = require('node:child_process');
 const { getLink } = require('./api');
 const { Link } = require('./db')
-const { ouo } = require('./ouo')
 const IS_DB = process.env.IS_DB || false
 const dataUrl = {}
 
@@ -87,18 +87,20 @@ const scrape = async (mainPageUrl) => {
       
           for (let i = 0; i < isParts; i++) {
             const pageUrl = linkNodeList[i].attribs.href
-            if (isShortlink(pageUrl)) {
-              const l = await ouo(pageUrl)
-              links.push(l)
+            const l = isShortlink(pageUrl)
+            if (l) {
+              const bypassed = await bypass(l)
+              links.push(bypassed)
             } else {
               links.push(pageUrl)
             }
           }
           arr.push({ name, link: links })
           } else {
-              if (isShortlink(link)) {
-                const l = await ouo(link)
-                arr.push({ name, link: l })
+              const l = isShortlink(link)
+              if (l) {
+                const bypassed = await bypass(l)
+                arr.push({ name, link: bypassed })
               } else {
                 arr.push({ name, link })
               }
@@ -124,18 +126,21 @@ const scrape = async (mainPageUrl) => {
       
           for (let i = 0; i < isParts; i++) {
             const pageUrl = linkNodeList[i].attribs.href
-            if (isShortlink(pageUrl)) {
-              const l = await ouo(pageUrl)
-              links.push(l)
+            const l = isShortlink(pageUrl)
+            if (l) {
+              const bypassed = await bypass(l)
+              links.push(bypassed)
             } else {
               links.push(pageUrl)
             }
           }
           return { name, link: links }
         } else {
-            if (isShortlink(link)) {
-              const l = await ouo(link)
-              return { name, link: l }
+            const l = isShortlink(link)
+            if (l) {
+              const bypassed = await bypass(l)
+              console.log(bypassed)
+              return { name, link: bypassed }
             } else {
               return { name, link }
             }
@@ -272,17 +277,38 @@ const insertToDb = async ({ name, link }) => {
   }
 }
 
+const bypass = async (url) => {
+  return new Promise( (resolve, reject) => {
+    (function antiError(x) {
+      exec(`python3 extractor/ouo.py ${url}`, { cwd: __dirname }, (error, stdout) => {
+        if (error && x == 1) {
+          reject(error)
+          return 
+        } else if (error && x > 1) {
+          antiError(x-1)
+        } else {
+          const trimed = stdout.trim()
+          resolve(trimed)
+          return
+        }
+      })
+    })(3)
+  })
+}
+
 const isMainPageUrl = url => {
   return url.match(/.+(anh\/|videos\/|video\/)$/)
 };
 
 const isShortlink = (url) => {
-  const { hostname } = urlParse.parse(url)
+  const { protocol, hostname, pathname } = urlParse.parse(url)
   let result
   switch (hostname) {
     case 'ouo.press':
     case 'ouo.io' :
-      result = true
+      let sProtocol = protocol.split(':')[0]
+      if (protocol === 'http:') sProtocol+='s'
+      result = `${sProtocol}://${hostname}${pathname}`
       break
     default:
       result = false
