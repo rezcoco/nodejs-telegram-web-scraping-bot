@@ -18,7 +18,7 @@ const { main } = require('./db')
 const bot = new TelegramBot(token, {polling: true});
 const htmlParse = { parse_mode: 'HTML' }
 // puppeteer
-const b = puppeteer.launch({ headless: true, args: minimal_args)
+const b = puppeteer.launch({ headless: true, args: minimal_args })
 b.then(() => console.log('Puppeteer launched')).catch(e => console.log(e))
   
 if (IS_DB) main()
