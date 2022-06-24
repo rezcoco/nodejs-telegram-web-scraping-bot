@@ -146,7 +146,7 @@ const scrape = async (mainPageUrl) => {
             }
         }
       } else {
-         arr.push({ name, link: null })
+         return { name, link: null }
       }
     }
   } catch (err) {
