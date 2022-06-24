@@ -1,4 +1,7 @@
 FROM node:lts-gallium
+
+WORKDIR /root/app
+RUN chmod 777 /root/app
  
 COPY package.json .
 RUN npm install
