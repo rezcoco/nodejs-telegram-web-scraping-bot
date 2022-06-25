@@ -12,7 +12,7 @@ const { tag, minimal_args } = require('./utilities')
 const { search } = require('./finder');
 const { keepAlive } = require('./alive')
 const { getLink } = require('./api');
-const { main } = require('./db')
+const { main, Link } = require('./db')
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
@@ -183,7 +183,9 @@ bot.on('error', (error) => {
 
 // Server
 app.get('/', (req, res) => {
-  res.send("It's Running")
+  Link.find((err, docs) => {
+    if (err) throw err
+    res.json(docs)
 })
 app.listen(PORT, () => {
   console.log(`Server listening to port: ${PORT}`)
