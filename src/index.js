@@ -186,7 +186,7 @@ app.get('/', (req, res) => {
   Link.find((err, docs) => {
     if (err) throw err
     res.json(docs)
-  )}
+  })
 })
 app.listen(PORT, () => {
   console.log(`Server listening to port: ${PORT}`)
