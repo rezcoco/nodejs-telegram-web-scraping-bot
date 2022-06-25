@@ -15,7 +15,7 @@ jobs:
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
-          region: "us"
+          region: "eu"
         env:
           TOKEN: ${{secrets.TOKEN}}
           URI: ${{secrets.URI}}
